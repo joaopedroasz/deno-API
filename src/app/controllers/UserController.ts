@@ -1,19 +1,56 @@
-import { Context } from "https://deno.land/x/oak/mod.ts";
+import { RouterContext, isHttpError } from "https://deno.land/x/oak/mod.ts";
+import { ObjectId } from "https://deno.land/x/mongo/mod.ts";
 
 import { User, UserSchema } from "../models/User.ts";
 
 class UserController {
-  public async store({ request, response }: Context) {
+  public async index({ request, response }: RouterContext): Promise<void> {
+    const users = await User.find();
+
+    response.body = { users };
+  }
+
+  public async store({ request, response }: RouterContext): Promise<void> {
     const { value } = await request.body();
     const { name, age } = value;
 
     const user = new UserSchema(name, age);
 
-    await User.insertOne(user);
+    const create = await User.insertOne(user);
 
-    response.body = {
-      value,
-    };
+    response.body = { create };
+  }
+
+  public async update({
+    request,
+    response,
+    params,
+  }: RouterContext): Promise<void> {
+    const { id } = params;
+
+    if (!id) return;
+
+    const _id = ObjectId(id);
+
+    await User.findOne({ _id });
+
+    response.body = { message: "User updated" };
+  }
+
+  public async delete({
+    request,
+    response,
+    params,
+  }: RouterContext): Promise<void> {
+    const { id } = params;
+
+    if (!id) return;
+
+    const _id = ObjectId(id);
+
+    await User.deleteOne({ _id });
+
+    response.body = { message: "User deleted" };
   }
 }
 
