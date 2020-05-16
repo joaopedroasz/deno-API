@@ -34,6 +34,14 @@ class UserController {
 
     await User.findOne({ _id });
 
+    const { value } = await request.body();
+    const { name, age } = value;
+
+    await User.updateOne(
+      { name: { $ne: null }, age: { $ne: null } },
+      { $set: { name, age } },
+    );
+
     response.body = { message: "User updated" };
   }
 
