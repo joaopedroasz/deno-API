@@ -60,7 +60,7 @@ sudo docker run --name mongodb -p 27017:27017 -d mongo
 
 O projeto se resume a um CRUD de usuários, uma vez que o objetivo do repositório é estudar sobre o Deno, escolhi implementar algo simples.
 
-## ✅ Intalação:
+## ✅ Instalação:
 
 Como está tudo configurado, para inicar o servidor é só dar o comando:
 
