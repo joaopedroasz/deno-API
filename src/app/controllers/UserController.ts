@@ -1,11 +1,11 @@
-import { RouterContext, isHttpError } from "https://deno.land/x/oak/mod.ts";
+import { RouterContext } from "https://deno.land/x/oak/mod.ts";
 import { ObjectId } from "https://deno.land/x/mongo/mod.ts";
 
 import { User, UserSchema } from "../models/User.ts";
 
 class UserController {
   public async index({ request, response }: RouterContext): Promise<void> {
-    const users = await User.find();
+    const users: UserSchema[] = await User.find();
 
     response.body = { users };
   }
@@ -14,11 +14,27 @@ class UserController {
     const { value } = await request.body();
     const { name, age } = value;
 
-    const user = new UserSchema(name, age);
+    const user: UserSchema = { name, age };
 
-    const create = await User.insertOne(user);
+    const newUser = await User.insertOne(user);
 
-    response.body = { create };
+    response.body = { newUser };
+  }
+
+  public async show({
+    request,
+    response,
+    params,
+  }: RouterContext): Promise<void> {
+    const { id } = params;
+
+    if (!id) return;
+
+    const _id = ObjectId(id);
+
+    const user: UserSchema = await User.findOne({ _id });
+
+    response.body = { user };
   }
 
   public async update({
@@ -32,15 +48,10 @@ class UserController {
 
     const _id = ObjectId(id);
 
-    await User.findOne({ _id });
-
     const { value } = await request.body();
     const { name, age } = value;
 
-    await User.updateOne(
-      { name: { $ne: null }, age: { $ne: null } },
-      { $set: { name, age } },
-    );
+    await User.updateOne({ _id }, { $set: { name, age } });
 
     response.body = { message: "User updated" };
   }
