@@ -15,6 +15,7 @@ class App {
 
   private routes(): void {
     this.app.use(routes.routes());
+    this.app.use(routes.allowedMethods());
   }
 
   private async database(): Promise<void> {
